@@ -80,7 +80,7 @@ export function createHubExtension(): HubExtensionLike {
 
 	return {
 		name: "tui-panes",
-		hints: ["Enter 分屏打开", "Tab 切换面板", "x 关闭面板"],
+		hints: ["Enter 分屏打开"],
 
 		/** 接管主体区:把各面板的可见区域合成成整块内容 */
 		bodyView(ctx: HostContext) {

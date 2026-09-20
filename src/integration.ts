@@ -52,7 +52,11 @@ export function createPaneIntegration(host: PaneHost, maxPanes = 4): PaneIntegra
 		const size = manager.layoutSize(rightWidth, bodyHeight);
 		try {
 			const ok = await manager.open(spec, size.cols, size.rows);
-			host.notify(ok ? `已打开面板「${spec.title}」` : "面板数量已达上限,先关闭一个(Ctrl+W 或 x)");
+			host.notify(
+				ok
+					? `已打开面板「${spec.title}」 · Tab 切换焦点 · Ctrl+Q 回到列表 · Ctrl+W 关闭面板`
+					: "面板数量已达上限,先关闭一个(Ctrl+W 或 x)",
+			);
 		} catch (error) {
 			host.notify(`面板不可用:${error instanceof Error ? error.message : String(error)}`);
 		}
