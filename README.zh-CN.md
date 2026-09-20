@@ -107,6 +107,15 @@ node demo/demo.ts "npm run dev"    # 面板里跑你的 dev server
 npm test        # 纯渲染逻辑(不需要 PTY)
 ```
 
+## 与核心的本地联调
+
+宿主消费的是编译产物(`dist/`),所以改完源码要先构建,再把本目录链进核心:
+
+```bash
+npm run build
+cd ../ai-session-hub && npm run dev:link -- ../tui-panes
+```
+
 ## 作为 ai-session-hub 的拓展
 
 - [ai-session-hub](https://github.com/Zzz210s/ai-session-hub) —— 主机级 AI 会话总览。拓展入口:`createHubExtension()`(实现宿主的 `HubExtension` 约定:`bodyView` / `openSelected` / `handleKey` / `handleRawInput` / `onResize` / `dispose`);若要在自己的 TUI 里用,可直接使用通用的 `PaneManager` / `composePanes`。

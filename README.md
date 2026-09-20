@@ -119,6 +119,15 @@ node demo/demo.ts "npm run dev"    # a pane running your dev server
 npm test        # pure rendering logic (no PTY required)
 ```
 
+## Local development with the hub
+
+The hub consumes the built output (`dist/`), so rebuild after changing sources, then link this checkout into the hub:
+
+```bash
+npm run build
+cd ../ai-session-hub && npm run dev:link -- ../tui-panes
+```
+
 ## Extension of
 
 - [ai-session-hub](https://github.com/Zzz210s/ai-session-hub) — host-level overview of running/historical AI CLI sessions. Helpers: `createHubExtension()` (implements the hub's `HubExtension` contract: `bodyView` / `openSelected` / `handleKey` / `handleRawInput` / `onResize` / `dispose`) for use as an extension, plus the generic `PaneManager` / `composePanes` if you want to embed panes in your own TUI.
