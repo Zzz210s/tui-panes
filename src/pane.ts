@@ -28,8 +28,16 @@ export interface PaneSnapshot {
 	exitCode?: number;
 }
 
+interface PtyProcess {
+	write(data: string): void;
+	resize(cols: number, rows: number): void;
+	kill(): void;
+	onData(handler: (data: string) => void): void;
+	onExit(handler: (event: { exitCode: number }) => void): void;
+}
+
 interface PaneInternals {
-	pty: { write(data: string): void; resize(cols: number, rows: number): void; kill(): void };
+	pty: PtyProcess;
 	term: { write(data: string): void; resize(cols: number, rows: number): void; dispose(): void };
 }
 
@@ -64,7 +72,7 @@ export class Pane {
 
 	private async start(spec: PaneSpec): Promise<void> {
 		const [ptyModule, xtermModule] = await Promise.all([import("node-pty"), import("@xterm/headless")]);
-		const pty = (ptyModule.default ?? ptyModule) as unknown as { spawn: (file: string, args: string[], options: Record<string, unknown>) => PaneInternals["pty"] };
+		const pty = (ptyModule.default ?? ptyModule) as unknown as { spawn: (file: string, args: string[], options: Record<string, unknown>) => PtyProcess };
 		const xtermAny = xtermModule as unknown as {
 			Terminal?: new (options: Record<string, unknown>) => PaneInternals["term"];
 			default?: { Terminal?: new (options: Record<string, unknown>) => PaneInternals["term"] };
@@ -81,11 +89,11 @@ export class Pane {
 			cwd: spec.cwd || process.cwd(),
 			env: { ...process.env, TERM: "xterm-256color" } as Record<string, string>,
 		});
-		child.onData?.((data: string) => {
+		child.onData((data: string) => {
 			term.write(data);
 			this.onDirty();
 		});
-		child.onExit?.(({ exitCode }: { exitCode: number }) => {
+		child.onExit(({ exitCode }: { exitCode: number }) => {
 			this.exited = true;
 			this.exitCode = exitCode;
 			this.onDirty();

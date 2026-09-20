@@ -8,16 +8,21 @@
     "node": ">=24"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
-    "src",
+    "dist",
     "demo",
     "README.md",
     "README.zh-CN.md",
     "LICENSE"
   ],
   "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
     "test": "node --test test/*.test.js",
     "demo": "node demo/demo.ts"
   },
@@ -36,6 +41,10 @@
     "url": "git+https://github.com/Zzz210s/tui-panes.git"
   },
   "author": "Zzz210s",
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "@types/node": "^24.0.0"
+  },
   "dependencies": {
     "@xterm/headless": "^6.0.0",
     "node-pty": "^1.1.0"
