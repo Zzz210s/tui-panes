@@ -1,7 +1,7 @@
 {
   "name": "tui-panes",
-  "version": "0.1.0",
-  "description": "Embed multiple live terminal panes (PTY + terminal emulation + view composition) inside a Node TUI",
+  "version": "0.2.0",
+  "description": "Same-page split panes for ai-session-hub (also usable as a standalone PTY-pane engine for Node TUIs)",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -27,6 +27,7 @@
     "demo": "node demo/demo.ts"
   },
   "keywords": [
+    "ai-session-hub",
     "tui",
     "terminal",
     "pty",
@@ -34,7 +35,8 @@
     "split",
     "xterm",
     "node-pty",
-    "conpty"
+    "conpty",
+    "extension"
   ],
   "repository": {
     "type": "git",

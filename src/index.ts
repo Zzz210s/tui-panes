@@ -17,3 +17,5 @@ export { PaneManager, type PaneManagerOptions } from "./manager.ts";
 export { cellsToAnsi, composePanes, paneTitle, styleToSgr, type Cell, type CellStyle, type PaneFrame } from "./render.ts";
 export { createPaneIntegration, type PaneHost, type PaneIntegration } from "./integration.ts";
 export { createTuiScreen, type TuiScreen, type TuiScreenOptions } from "./screen.ts";
+// ai-session-hub 拓展入口(宿主运行时加载)
+export { createHubExtension, type HubExtensionLike } from "./hub-extension.ts";

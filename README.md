@@ -2,7 +2,9 @@
 
 **English** | [简体中文](./README.zh-CN.md)
 
-Embed multiple **live terminal panes** inside a Node TUI: each pane runs a real process in a PTY, its output is parsed by a headless terminal emulator, and the visible region is composed into your own screen buffer — so panes can share the screen with a list, a sidebar, or other UI instead of taking over the whole terminal.
+**Same-page split panes for [ai-session-hub](https://github.com/Zzz210s/ai-session-hub)** — the extension that runs several agent sessions side by side inside the hub's TUI, each pane a real PTY rendered by a headless terminal emulator.
+
+It also works as a standalone engine for any Node TUI: `ai-session-hub` is simply its first host.
 
 Built for TUI tools that need to *watch and drive several long-running CLI processes at once* (AI coding agents, build watchers, log tails) without spawning extra terminal windows.
 
@@ -26,6 +28,18 @@ npm install tui-panes
 # or from git
 npm install github:Zzz210s/tui-panes
 ```
+
+## As an extension of ai-session-hub
+
+The hub loads extensions at startup (default list: `tui-panes`). Install it next to the hub and it is picked up automatically:
+
+```bash
+cd ~/ai-session-hub && npm install github:Zzz210s/tui-panes
+# then, inside the hub:  Enter / p = open the selected session in a split pane
+#                        Tab = cycle focus, x / Ctrl+W = close, Ctrl+Q = back to the list
+```
+
+Override the list with `AIS_EXTENSIONS=tui-panes,other` or `~/.ai-session-hub/extensions.json`.
 
 ## Quick start
 
@@ -76,6 +90,7 @@ if (panes.handleFocusedInput(rawKey)) return; // consumed by the pane
 | `composePanes` | Pure: stack pane frames (title bar + lines) into a fixed-size region |
 | `cellsToAnsi` / `styleToSgr` / `paneTitle` | Pure rendering helpers (cell grid → ANSI, SGR from attributes, title bar) |
 | `createPaneIntegration` | Host glue: selection → spec, layout metrics, redraw scheduling, notifications, escape keys |
+| `createHubExtension` | The ai-session-hub extension entry point (returns `HubExtensionLike`) |
 | `defaultShell` | Picks Git Bash on Windows, otherwise `bash` |
 
 `PaneSpec` is deliberately generic — `{ id, title, command, cwd?, shell? }` — so the library does not depend on your domain model.
@@ -104,9 +119,9 @@ node demo/demo.ts "npm run dev"    # a pane running your dev server
 npm test        # pure rendering logic (no PTY required)
 ```
 
-## Used by
+## Extension of
 
-- [ai-session-hub](https://github.com/Zzz210s/ai-session-hub) — host-level overview of running/historical AI CLI sessions; panes let it show several agent sessions side by side inside the TUI
+- [ai-session-hub](https://github.com/Zzz210s/ai-session-hub) — host-level overview of running/historical AI CLI sessions. Helpers: `createHubExtension()` (implements the hub's `HubExtension` contract: `bodyView` / `openSelected` / `handleKey` / `handleRawInput` / `onResize` / `dispose`) for use as an extension, plus the generic `PaneManager` / `composePanes` if you want to embed panes in your own TUI.
 
 ## License
 

@@ -2,7 +2,9 @@
 
 [English](./README.md) | **简体中文**
 
-在 Node TUI 里嵌入多个**真实终端面板**:每个面板用 PTY 跑一个进程,输出交给 headless 终端仿真器解析,再把可见区域合成到你自己的屏幕缓冲里——因此面板可以和列表、侧栏等 UI **共享屏幕**,而不必独占整个终端。
+**[ai-session-hub](https://github.com/Zzz210s/ai-session-hub) 的同页分屏拓展** —— 在核心的 TUI 里并排运行多个 agent 会话,每格面板是一个真实 PTY,输出由 headless 终端仿真器解析后渲染进宿主的屏幕。
+
+它也可以作为通用引擎用于其它 Node TUI:`ai-session-hub` 只是它的第一个宿主。
 
 适合需要在**一个 TUI 里同时观察并操作多个长驻 CLI 进程**的场景(AI 编码助手、构建监听、日志跟踪),免去额外开终端窗口。
 
@@ -76,6 +78,7 @@ if (panes.handleFocusedInput(rawKey)) return; // 已被面板消费
 | `composePanes` | 纯函数:把面板帧(标题栏 + 内容行)堆叠进固定尺寸区域 |
 | `cellsToAnsi` / `styleToSgr` / `paneTitle` | 纯渲染工具(单元格 → ANSI、属性 → SGR、标题栏) |
 | `createPaneIntegration` | 宿主接线:选中项 → 规格、布局尺寸、重绘节流、提示、逃生键 |
+| `createHubExtension` | ai-session-hub 拓展入口(返回 `HubExtensionLike`) |
 | `defaultShell` | Windows 优先 Git Bash,否则 `bash` |
 
 `PaneSpec` 刻意保持通用——`{ id, title, command, cwd?, shell? }`——因此库不依赖你的业务模型。
@@ -104,9 +107,17 @@ node demo/demo.ts "npm run dev"    # 面板里跑你的 dev server
 npm test        # 纯渲染逻辑(不需要 PTY)
 ```
 
-## 使用方
+## 作为 ai-session-hub 的拓展
 
-- [ai-session-hub](https://github.com/Zzz210s/ai-session-hub) —— 主机级 AI 会话总览,分屏面板让它在同一个 TUI 里并排查看多个 agent 会话
+- [ai-session-hub](https://github.com/Zzz210s/ai-session-hub) —— 主机级 AI 会话总览。拓展入口:`createHubExtension()`(实现宿主的 `HubExtension` 约定:`bodyView` / `openSelected` / `handleKey` / `handleRawInput` / `onResize` / `dispose`);若要在自己的 TUI 里用,可直接使用通用的 `PaneManager` / `composePanes`。
+
+安装即启用:
+
+```bash
+cd ~/ai-session-hub && npm install github:Zzz210s/tui-panes
+# 核心 TUI 内:Enter / p 在分屏里打开选中会话,Tab 切换,x / Ctrl+W 关闭,Ctrl+Q 回到列表
+```
+
 
 ## License
 
