@@ -92,6 +92,18 @@ if (panes.handleFocusedInput(rawKey)) return; // 已被面板消费
 5. **交出终端时务必挂起自己的循环**。如果同时支持整屏 "attach",必须先停刷新计时器、摘掉 `stdin`/`resize` 监听、退出 raw 模式,否则本程序会与被接管的进程抢屏。
 6. **宽字符**占两格,尾随格是 `chars` 为空的占位格,不能当空格输出。
 
+## Shell 适配
+
+面板里的命令由 shell 承载,而各 shell 的启动参数不同 —— 已替你处理:
+
+| shell(自动探测,或在面板规格里指定 `shell`) | 参数 |
+|---|---|
+| Git Bash / bash | `-lc "<command>; exec bash"`(面板保持可交互) |
+| PowerShell(`powershell.exe` / `pwsh.exe`) | `-NoLogo -NoProfile -NoExit -Command "<command>"` |
+| cmd | `/d /s /c "<command>"` |
+
+`defaultShell()` 优先 Git Bash,其次 PowerShell;需要直接使用时,`shellFlavor()` / `shellArgs()` 均有导出。
+
 ## 演示
 
 ```bash

@@ -104,6 +104,18 @@ if (panes.handleFocusedInput(rawKey)) return; // consumed by the pane
 5. **Suspend your own loops when you hand over the terminal.** If you also support full-terminal "attach", stop your refresh timer, remove `stdin`/`resize` listeners and leave raw mode first — otherwise your TUI and the attached process fight over the screen.
 6. **Wide characters** occupy two cells; the trailing cell is a placeholder with empty `chars` and must not be rendered as a space.
 
+## Shell support
+
+A pane runs its command through a shell, and the launch arguments differ per shell — handled for you:
+
+| Shell (auto-detected, or set `shell` in the pane spec) | Arguments |
+|---|---|
+| Git Bash / bash | `-lc "<command>; exec bash"` (pane stays interactive) |
+| PowerShell (`powershell.exe` / `pwsh.exe`) | `-NoLogo -NoProfile -NoExit -Command "<command>"` |
+| cmd | `/d /s /c "<command>"` |
+
+`defaultShell()` picks Git Bash when present, then PowerShell; `shellFlavor()` / `shellArgs()` are exported if you need them directly.
+
 ## Demo
 
 ```bash

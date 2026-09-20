@@ -2,10 +2,12 @@
  * 一个面板 = 一个 PTY 进程 + 一份 @xterm/headless 屏幕缓冲
  * 面板的输出由终端仿真器解析成屏幕,再把可见区域取出来交给宿主 TUI 渲染,
  * 因此面板不占用整屏,可以与列表等其它 UI 并存。
+ *
+ * shell 适配(参数形态)在 shell.ts:bash / PowerShell / cmd 各不相同。
  */
 
-import { existsSync } from "node:fs";
 import { cellsToAnsi, type Cell, type CellStyle } from "./render.ts";
+import { defaultShell, shellArgs } from "./shell.ts";
 
 export interface PaneSpec {
 	/** 面板标识(宿主用来去重/查找) */
@@ -16,7 +18,7 @@ export interface PaneSpec {
 	command: string;
 	/** 工作目录 */
 	cwd?: string;
-	/** 启动命令用的 shell(默认自动探测 Git Bash / bash) */
+	/** 启动命令用的 shell(默认自动探测 Git Bash / PowerShell) */
 	shell?: string;
 }
 
@@ -72,7 +74,9 @@ export class Pane {
 
 	private async start(spec: PaneSpec): Promise<void> {
 		const [ptyModule, xtermModule] = await Promise.all([import("node-pty"), import("@xterm/headless")]);
-		const pty = (ptyModule.default ?? ptyModule) as unknown as { spawn: (file: string, args: string[], options: Record<string, unknown>) => PtyProcess };
+		const pty = (ptyModule.default ?? ptyModule) as unknown as {
+			spawn: (file: string, args: string[], options: Record<string, unknown>) => PtyProcess;
+		};
 		const xtermAny = xtermModule as unknown as {
 			Terminal?: new (options: Record<string, unknown>) => PaneInternals["term"];
 			default?: { Terminal?: new (options: Record<string, unknown>) => PaneInternals["term"] };
@@ -82,7 +86,8 @@ export class Pane {
 		if (!Terminal) throw new Error("@xterm/headless 不可用(未安装)");
 
 		const term = new Terminal({ cols: this.cols, rows: this.rows, allowProposedApi: true, scrollback: 2000 });
-		const child = pty.spawn(spec.shell ?? defaultShell(), ["-lc", spec.command], {
+		const shell = spec.shell ?? defaultShell();
+		const child = pty.spawn(shell, shellArgs(shell, spec.command), {
 			name: "xterm-256color",
 			cols: this.cols,
 			rows: this.rows,
@@ -140,16 +145,6 @@ export class Pane {
 		this.internals?.term.dispose();
 		this.internals = null;
 	}
-}
-
-/** 默认 shell:优先 Git Bash(Windows),否则 bash */
-export function defaultShell(): string {
-	const candidates = [
-		`${process.env.ProgramFiles ?? "C:\\Program Files"}\\Git\\bin\\bash.exe`,
-		`${process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)"}\\Git\\bin\\bash.exe`,
-	];
-	for (const candidate of candidates) if (existsSync(candidate)) return candidate;
-	return "bash";
 }
 
 interface XtermLine {

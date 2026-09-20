@@ -13,6 +13,7 @@
  */
 
 export { Pane, type PaneSnapshot, type PaneSpec } from "./pane.ts";
+export { defaultShell, shellArgs, shellFlavor, type ShellFlavor } from "./shell.ts";
 export { PaneManager, type PaneManagerOptions } from "./manager.ts";
 export { cellsToAnsi, composePanes, paneTitle, styleToSgr, type Cell, type CellStyle, type PaneFrame } from "./render.ts";
 export { createPaneIntegration, type PaneHost, type PaneIntegration } from "./integration.ts";
